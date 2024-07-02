@@ -18,8 +18,6 @@ The AI opponent evaluates the board using a minimax algorithm with alpha-beta pr
 - Restart game with 'r' key
 ### Strategic AI: 
 - Uses minimax with alpha-beta pruning for strategic play
-### GPU acceleration: 
-- Faster calculations for minimal lag (optional, requires compatible graphics card)
 ### Smooth animations: 
 - Enhanced user experience with fluid animations
 ### Human vs. AI: 
