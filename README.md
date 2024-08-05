@@ -1,4 +1,4 @@
-# C++ Chess Engine with SFML and GPU Acceleration
+# C++ Chess Engine with SFML
 
 This project implements a chess engine built with C++ and the SFML library. Players can compete against a computer opponent powered by a minimax algorithm with alpha-beta pruning for efficient move selection.
 
