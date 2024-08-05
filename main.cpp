@@ -377,6 +377,16 @@ void back(std::string str)
     }
 }
 
+void undoMoves()
+{
+    for (int i = 0; i < 2; i++)
+    {
+        turns--;
+        back(position.substr(position.length() - 5, 4));
+        position.erase(position.length() - 5, 5);
+    }
+}
+
 int evaluate()
 {
     int *bMap[] = {bRookPos, bKnightPos, bBishopPos, bQueenPos, bKingPos, bPawnPos, bKingEndGame};
@@ -575,23 +585,32 @@ void compMove(RenderWindow &window, Sprite &sBoard)
     Vector2f oldPos = toCord(str[0], str[1]);
     Vector2f newPos = toCord(str[2], str[3]);
 
-    if (!endGame && isEndGame())
-        endGame = true;
-    if (!gameOver && isGameOver())
-        gameOver = true;
-
     move(str);
     position += str + ' ';
 
     Vector2f p = newPos - oldPos;
-    int frames = 500;
-    for (int i = 0; i < frames; i++)
+    float duration = 0.25f;
+    Clock clock;
+
+    while (true)
     {
-        f[n].move(p.x / frames, p.y / frames);
+        float elapsed = clock.getElapsedTime().asSeconds();
+
+        if (elapsed >= duration)
+            break;
+
+        Vector2f currPos = oldPos + p * (elapsed / duration);
+        f[n].setPosition(currPos);
+
         draw(window, sBoard);
     }
 
     f[n].setPosition(newPos);
+
+    if (!endGame && isEndGame())
+        endGame = true;
+    if (!gameOver && isGameOver())
+        gameOver = true;
 
     turns++;
 }
@@ -634,11 +653,7 @@ int main()
                 if (e.key.code == Keyboard::Key::BackSpace)
                 {
                     if (position.length())
-                    {
-                        turns--;
-                        back(position.substr(position.length() - 5, 4));
-                        position.erase(position.length() - 5, 5);
-                    }
+                        undoMoves();
                 }
                 else if (e.key.code == Keyboard::Key::R)
                     restart();
