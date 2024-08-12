@@ -70,6 +70,53 @@ bool isGameOver()
     return false;
 }
 
+int backtrack(std::string &str, int i, int j, std::vector<Vector2f> &moves, int depth, int alpha, int beta, bool forWhite)
+{
+    move(str);
+    turns++;
+    f[i].setPosition(moves[j]);
+    int eval = minimax(depth - 1, alpha, beta, forWhite);
+    turns--;
+    back(str);
+
+    return eval;
+}
+
+void minmaxUtil(int depth, int &alpha, int &beta, bool forWhite, int &i, int &someEval)
+{
+    std::vector<Vector2f> moves;
+    Vector2f pos = f[i].getPosition();
+
+    if (!isValid(pos))
+        return;
+
+    possibleMoves(i, moves);
+
+    for (int j = 0; j < moves.size(); j++)
+    {
+        std::string str = toChessNote(pos) + toChessNote(moves[j]);
+
+        int eval = backtrack(str, i, j, moves, depth, alpha, beta, false);
+
+        if (forWhite)
+        {
+            someEval = std::max(someEval, eval);
+            alpha = std::max(alpha, eval);
+        }
+        else
+        {
+            someEval = std::min(someEval, eval);
+            beta = std::min(beta, eval);
+        }
+
+        if (beta <= alpha)
+        {
+            i = 32;
+            break;
+        }
+    }
+}
+
 int minimax(int depth, int alpha, int beta, bool forWhite)
 {
     if (!depth || isGameOver())
@@ -79,72 +126,16 @@ int minimax(int depth, int alpha, int beta, bool forWhite)
     {
         int maxEval = -1e9;
         for (int i = 16; i < 32; i++)
-        {
-            std::vector<Vector2f> moves;
-            Vector2f pos = f[i].getPosition();
+            minmaxUtil(depth, alpha, beta, true, i, maxEval);
 
-            if (!isValid(pos))
-                continue;
-
-            possibleMoves(i, moves);
-
-            for (int j = 0; j < moves.size(); j++)
-            {
-                std::string str = toChessNote(pos) + toChessNote(moves[j]);
-
-                move(str);
-                turns++;
-                f[i].setPosition(moves[j]);
-                int eval = minimax(depth - 1, alpha, beta, false);
-                turns--;
-                back(str);
-
-                maxEval = std::max(maxEval, eval);
-                alpha = std::max(alpha, eval);
-
-                if (beta <= alpha)
-                {
-                    i = 32;
-                    break;
-                }
-            }
-        }
         return maxEval;
     }
     else
     {
         int minEval = 1e9;
         for (int i = 0; i < 16; i++)
-        {
-            std::vector<Vector2f> moves;
-            Vector2f pos = f[i].getPosition();
+            minmaxUtil(depth, alpha, beta, false, i, minEval);
 
-            if (!isValid(pos))
-                continue;
-
-            possibleMoves(i, moves);
-
-            for (int j = 0; j < moves.size(); j++)
-            {
-                std::string str = toChessNote(pos) + toChessNote(moves[j]);
-
-                move(str);
-                turns++;
-                f[i].setPosition(moves[j]);
-                int eval = minimax(depth - 1, alpha, beta, true);
-                turns--;
-                back(str);
-
-                minEval = std::min(minEval, eval);
-                beta = std::min(beta, eval);
-
-                if (beta <= alpha)
-                {
-                    i = 32;
-                    break;
-                }
-            }
-        }
         return minEval;
     }
 }
@@ -168,12 +159,7 @@ std::string minimaxString(int depth, int alpha, int beta)
         {
             std::string str = toChessNote(pos) + toChessNote(moves[j]);
 
-            move(str);
-            turns++;
-            f[i].setPosition(moves[j]);
-            int eval = minimax(depth - 1, alpha, beta, true);
-            turns--;
-            back(str);
+            int eval = backtrack(str, i, j, moves, depth, alpha, beta, true);
 
             if (minEval > eval)
             {

@@ -10,4 +10,5 @@ void move(std::string str);
 void back(std::string str);
 void undoMoves();
 bool isEndGame();
+void checkConditions();
 void compMove(sf::RenderWindow &window, sf::Sprite &sBoard);

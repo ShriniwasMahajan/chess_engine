@@ -94,8 +94,18 @@ bool isEndGame()
     return true;
 }
 
+void checkConditions()
+{
+    if (!endGame && isEndGame())
+        endGame = true;
+    if (!gameOver && isGameOver())
+        gameOver = true;
+}
+
 void compMove(RenderWindow &window, Sprite &sBoard)
 {
+    checkConditions();
+
     if (gameOver)
         return;
 
@@ -130,10 +140,7 @@ void compMove(RenderWindow &window, Sprite &sBoard)
 
     f[n].setPosition(newPos);
 
-    if (!endGame && isEndGame())
-        endGame = true;
-    if (!gameOver && isGameOver())
-        gameOver = true;
+    checkConditions();
 
     turns++;
 }
